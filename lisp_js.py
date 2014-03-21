@@ -172,7 +172,7 @@ def read_from(tokens):
 
     if '(' == token:
 
-        print '\n\nSTARTING A NEW NODE.'
+        # print '\n\nSTARTING A NEW NODE.'
         # each node has its own environment -- must account for this later in eval
         # could optimize this later to refer to later constructed nodes. Meh. 
 
@@ -228,13 +228,15 @@ def to_js(exp):
     print '\n\nexp is now', exp
     if exp == None: 
         return ''
-    if type(exp) == int:
+    if type(exp) == int or type(exp) == float or type(exp) == str:
         return str(exp)
 
     token = exp.pop(0)
     print 'THE TOKEN IS ', token
 
-    # defining area function
+    # ['define', 'area', ['lambda', ['r'], ['*', 3.141592653, ['*', 'r', 'r']]]]
+    # (define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1))))))
+
     if token == 'define':
         var_name = exp[0]
         value = exp[1]
@@ -246,13 +248,26 @@ def to_js(exp):
             else: 
                 args = ', '.join(args)
                 print args
-            return 'var ' + var_name + ' = ' + 'function(' + args +'){'
+
+            if global_env.get(value[2][0]):
+                return_statement = 'return '
+            else: 
+                return_statement = '' 
+            return 'var ' + var_name + ' = function(' + args +'){ ' + return_statement + to_js(value[2]) + '}'
         else: 
             return value
 
+    if token == 'if':
+        test = exp[0]
+        conseq = exp[1]
+        alt = exp[2]
+
+        return 'if' + to_js(test) + '{ return ' + to_js(conseq) + ' } else { return ' + to_js(alt) + '}'
+
     if type(token) != int:
-        if token in ['+', '-', '*', '/']:
-            print 'THIS IS A MATH THING'
+        # MUST DEAL WITH THIS - must account for user-defined variables in global_env
+        if global_env[token]:
+            print 'THIS IS A THING', token
             s = '(' + to_js(exp[0])
             for i in exp[1:]:
                 s += ' ' + token + ' ' + to_js(i)
@@ -291,7 +306,8 @@ if __name__ == "__main__":
 
     user_input ='(* 93 8 (+ 9 9 4)9 (- 0 9 8))'
     # user_input = '(+ 9 0 8 0)'
-    user_input = '(define area (lambda (r) (* 3.141592653 (* r r))))'
+    user_input = '(define area (lambda (r) (* 3.141592653 r r)))'
+    user_input = '(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1))))))'
     
     l = parse(user_input)
     print 'evaluates to', eval(l)
