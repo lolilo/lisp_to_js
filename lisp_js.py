@@ -233,11 +233,22 @@ def to_js(exp):
 
     token = exp.pop(0)
     print 'THE TOKEN IS ', token
-    # if type(token) == list:
-    #     exp = token
-    #     token = exp.pop(0)
-    #     print 'yoyoyoyoyo'
-    #     return '(;ldfkjs;lkgj)'
+
+    # defining area function
+    if token == 'define':
+        var_name = exp[0]
+        value = exp[1]
+        if value[0] == 'lambda':
+            args = value[1]
+            
+            if len(args) == 1:
+                args = args[0] # should already be a string
+            else: 
+                args = ', '.join(args)
+                print args
+            return 'var ' + var_name + ' = ' + 'function(' + args +'){'
+        else: 
+            return value
 
     if type(token) != int:
         if token in ['+', '-', '*', '/']:
@@ -280,6 +291,7 @@ if __name__ == "__main__":
 
     user_input ='(* 93 8 (+ 9 9 4)9 (- 0 9 8))'
     # user_input = '(+ 9 0 8 0)'
+    user_input = '(define area (lambda (r) (* 3.141592653 (* r r))))'
     
     l = parse(user_input)
     print 'evaluates to', eval(l)
