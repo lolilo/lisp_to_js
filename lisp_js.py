@@ -228,26 +228,24 @@ def to_js(exp):
     print '\n\nexp is now', exp
     if exp == None: 
         return ''
-
     if type(exp) == int:
         return str(exp)
 
     token = exp.pop(0)
-    if type(token) == list:
-        exp = token
-        token = exp.pop(0)
-        print 'yoyoyoyoyo'
-        return '(;ldfkjs;lkgj)'
+    print 'THE TOKEN IS ', token
+    # if type(token) == list:
+    #     exp = token
+    #     token = exp.pop(0)
+    #     print 'yoyoyoyoyo'
+    #     return '(;ldfkjs;lkgj)'
 
     if type(token) != int:
-        print 'this is the token', token
         if token in ['+', '-', '*', '/']:
             print 'THIS IS A MATH THING'
-            # return (' ' + token + ' ').join(to_js(exp))
-            s = to_js(exp[0])
+            s = '(' + to_js(exp[0])
             for i in exp[1:]:
                 s += ' ' + token + ' ' + to_js(i)
-            return s
+            return s + ')'
     else:
         # print 'returning a string', token
         print type(str(token))
@@ -280,13 +278,15 @@ if __name__ == "__main__":
     global expression_trace
     expression_trace = []
 
-    user_input ='(* 93 8 9 0 (- 0 9 8))'
+    user_input ='(* 93 8 (+ 9 9 4)9 (- 0 9 8))'
     # user_input = '(+ 9 0 8 0)'
     
     l = parse(user_input)
+    print 'evaluates to', eval(l)
     print 'exp parsed', l
     js = to_js(l)
     print 'JavaScript, yo!--  ', js
+
 
     # uncomment repl() for troubleshooting in the terminal
     # repl()
