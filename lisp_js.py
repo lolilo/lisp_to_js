@@ -58,7 +58,6 @@ def add_globals(env):
 
 global_env = add_globals(Env())
 
-
 """          eval           """
 
 # Evaluate an expression x in an environment env.
@@ -253,7 +252,7 @@ def to_js(exp):
                 return_statement = 'return '
             else: 
                 return_statement = '' 
-            return 'var ' + var_name + ' = function(' + args +'){ ' + return_statement + to_js(value[2]) + '}'
+            return 'var ' + var_name + ' = function(' + args +') { ' + return_statement + to_js(value[2]) + ' }'
         else: 
             return value
 
@@ -262,7 +261,7 @@ def to_js(exp):
         conseq = exp[1]
         alt = exp[2]
 
-        return 'if ' + to_js(test) + '{ return ' + to_js(conseq) + ' } else { return ' + to_js(alt) + '}'
+        return 'if ' + to_js(test) + ' { return ' + to_js(conseq) + ' } else { return ' + to_js(alt) + ' }'
 
     if type(token) != int:
         # MUST DEAL WITH THIS - must account for user-defined variables in global_env
@@ -278,6 +277,8 @@ def to_js(exp):
             # '<=' : op.le,
 
 
+# (define count (lambda (item L) (if L (+ (equal? item (car L)) (count item (cdr L))) 0)))
+
         # if global_env[token]:
         if token in ['+', '-', '*', '/', '>', '<', '>=', '<=']:
             print 'THIS IS A THING', token
@@ -285,6 +286,16 @@ def to_js(exp):
             for i in exp[1:]:
                 s += ' ' + token + ' ' + to_js(i)
             return s + ')'
+        # elif token in ['equal?', 'eq?', 'list?', 'null?', 'symbol?']:
+        #     s = '(' + to_js(exp[0])
+
+        elif token == 'equal?':
+            arg1 = exp[0]
+            arg2 = exp[1]
+            print arg1, 'and', arg2
+            s = to_js(arg1) + ' == ' + to_js(arg2)
+            return s
+
         else:
             print 'fact exp is', exp
             # function call situation
@@ -324,8 +335,10 @@ if __name__ == "__main__":
     user_input ='(* 93 8 (+ 9 9 4)9 (- 0 9 8))'
     # user_input = '(+ 9 0 8 0)'
     # user_input = '(define area (lambda (r) (* 3.141592653 r r)))'
-    # user_input = '(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1))))))'
-    
+    user_input = '(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1))))))'
+    user_input = '(define count (lambda (item L) (if L (+ (equal? item (car L)) (count item (cdr L))) 0)))'
+    user_input = '(define fib (lambda (n) (if (< n 2) n (+ (fib (- n 1)) (fib (- n 2))))))'
+
     l = parse(user_input)
     print 'evaluates to', eval(l)
     print 'exp parsed', l
