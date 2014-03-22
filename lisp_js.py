@@ -262,16 +262,33 @@ def to_js(exp):
         conseq = exp[1]
         alt = exp[2]
 
-        return 'if' + to_js(test) + '{ return ' + to_js(conseq) + ' } else { return ' + to_js(alt) + '}'
+        return 'if ' + to_js(test) + '{ return ' + to_js(conseq) + ' } else { return ' + to_js(alt) + '}'
 
     if type(token) != int:
         # MUST DEAL WITH THIS - must account for user-defined variables in global_env
-        if global_env[token]:
+
+            # '+' : art.add, 
+            # '-' : art.sub, 
+            # '*' : art.mul, 
+            # '/' : art.div, 
+            # 'not' : op.not_,
+            # '>' : op.gt,
+            # '<' : op.lt,
+            # '>=' : op.ge,
+            # '<=' : op.le,
+
+
+        # if global_env[token]:
+        if token in ['+', '-', '*', '/', '>', '<', '>=', '<=']:
             print 'THIS IS A THING', token
             s = '(' + to_js(exp[0])
             for i in exp[1:]:
                 s += ' ' + token + ' ' + to_js(i)
             return s + ')'
+        else:
+            print 'fact exp is', exp
+            # function call situation
+            return token + to_js(exp[0])
     else:
         # print 'returning a string', token
         print type(str(token))
@@ -306,8 +323,8 @@ if __name__ == "__main__":
 
     user_input ='(* 93 8 (+ 9 9 4)9 (- 0 9 8))'
     # user_input = '(+ 9 0 8 0)'
-    user_input = '(define area (lambda (r) (* 3.141592653 r r)))'
-    user_input = '(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1))))))'
+    # user_input = '(define area (lambda (r) (* 3.141592653 r r)))'
+    # user_input = '(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1))))))'
     
     l = parse(user_input)
     print 'evaluates to', eval(l)
